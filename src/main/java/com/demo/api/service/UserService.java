@@ -1,13 +1,13 @@
 package com.demo.api.service;
 
-import java.util.Map;
+import java.util.List;
 
-import com.demo.api.model.User;
+import com.demo.api.payload.UserDto;
 
 public interface UserService {
-	public User createUser(User us);
-	public User getUser(String userId);
-	public User deleteUser(String userId);
-	public User putUser(String userId, User us);
-	public Map<String,User> getAllUser();
+	public UserDto createUser(UserDto us);
+	public UserDto getUser(Integer userId);
+	public UserDto deleteUser(Integer userId);
+	public UserDto putUser(Integer userId, UserDto us);
+	public List<UserDto> getAllUser();
 }

@@ -1,6 +1,6 @@
-package com.demo.api.model;
+package com.demo.api.payload;
 
-public class User {
+public class UserDto {
 	private String name;
 	private String id;
 	private String email;

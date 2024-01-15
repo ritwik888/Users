@@ -1,20 +1,31 @@
 package com.demo.api.service.impl;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.demo.api.model.User;
+import com.demo.api.exception.ResourceNotFoundException;
+import com.demo.api.dao.UserDao;
+import com.demo.api.entity.User;
+import com.demo.api.payload.UserDto;
 import com.demo.api.service.UserService;
 import com.demo.api.utill.UserUtill;
 
 @Service
 public class UserServiceImpl implements UserService{
 	
-	Map<String,User> userMap;
+	Map<String,UserDto> userMap;
 	UserUtill utill;
+	
+	@Autowired
+	UserDao dao;
+	
+	@Autowired
+	ModelMapper mapper;
 	
 	@Autowired
 	public UserServiceImpl(UserUtill utill) {
@@ -22,53 +33,46 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public User createUser(User us) {
-		User newUser = new User();
-		newUser.setName(us.getName());
-		newUser.setEmail(us.getEmail());
-		String id = utill.generateRandomId();
-		newUser.setId(id);
-		if(userMap == null) {
-			userMap = new HashMap<String,User>();
-		}
-		userMap.put(id, newUser);
-		return newUser;
+	public UserDto getUser(Integer userId) {
+		User user = dao.findById(userId).orElseThrow(()->new ResourceNotFoundException("User","id",userId.toString()));
+		UserDto dto = mapper.map(user, UserDto.class);
+		return dto;
+	}
+	
+	@Override
+	public UserDto createUser(UserDto us) {
+		User newUser = mapper.map(us, User.class);
+		newUser = dao.save(newUser);
+		UserDto dto = mapper.map(newUser, UserDto.class);
+		return dto;
+	}	
+
+	@Override
+	public UserDto deleteUser(Integer userId) {
+		User user = dao.findById(userId).orElseThrow(()->new ResourceNotFoundException("User","id",userId.toString()));
+		dao.delete(user);
+		UserDto dto = mapper.map(user, UserDto.class);
+		return dto;
 	}
 
 	@Override
-	public User getUser(String userId) {
-		if(userMap != null && userMap.containsKey(userId)) {
-			return userMap.get(userId);
-		}else {
-			return null;
+	public UserDto putUser(Integer userId, UserDto us) {
+		User user = dao.findById(userId).orElseThrow(()->new ResourceNotFoundException("User","id",userId.toString()));
+		User userentity = mapper.map(us, User.class);
+		userentity.setId(userId);
+		dao.save(userentity);
+		UserDto savedDto = mapper.map(userentity, UserDto.class);
+		return savedDto;
 		}
-	}
 
 	@Override
-	public User deleteUser(String userId) {
-		if(userMap != null && userMap.containsKey(userId)) {
-			User us = userMap.remove(userId);
-			return us;
-		}else {
-			return null;
+	public List<UserDto> getAllUser() {
+		List<User> users = dao.findAll();
+		List<UserDto> allUserDto = new ArrayList<>();
+		for(User u : users) {
+			allUserDto.add(mapper.map(u, UserDto.class));
 		}
-	}
-
-	@Override
-	public User putUser(String userId, User us) {
-		if(userMap != null && userMap.containsKey(userId)) {
-			User us2 = userMap.get(userId);
-			us2.setEmail(us.getEmail());
-			us2.setName(us.getName());
-			return us2;
-		}else {
-			return null;
-		}
-	}
-
-	@Override
-	public Map<String, User> getAllUser() {
-		return userMap;
+		return allUserDto;
 	}
 
 }

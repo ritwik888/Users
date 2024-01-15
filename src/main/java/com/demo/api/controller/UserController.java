@@ -1,6 +1,6 @@
 package com.demo.api.controller;
 
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,59 +16,52 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.demo.api.model.User;
+import com.demo.api.payload.UserDto;
 import com.demo.api.service.UserService;
 
 @RestController
 @RequestMapping("users")
-public class Users {
+public class UserController {
 	
 	@Autowired
 	UserService service;
 	
 	@GetMapping(path="/{userId}", produces = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
-	public ResponseEntity<User> getUser(@PathVariable String userId) {
-		User us = service.getUser(userId);
-		if(us != null) {
-			return new ResponseEntity<User>(us,HttpStatus.OK);
-		}
-		return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+	public ResponseEntity<UserDto> getUser(@PathVariable Integer userId) {
+		System.out.println("get user called");
+		UserDto us = service.getUser(userId);
+		return new ResponseEntity<UserDto>(us,HttpStatus.OK);
 	}
 	
 	@GetMapping
-	public ResponseEntity<Map<String,User>> getUsers(@RequestParam(value="page", defaultValue="1", required=false) int page,
+	public ResponseEntity<List<UserDto>> getUsers(@RequestParam(value="page", defaultValue="1", required=false) int page,
 							@RequestParam(value="limit", defaultValue="10", required=false) int limit,
 							@RequestParam(value="sort", defaultValue="desc", required=false) String sort) {
-		Map<String,User> allUser = service.getAllUser();
-		return new ResponseEntity<Map<String,User>>(allUser,HttpStatus.OK);
+		System.out.println("get all user called");
+		List<UserDto> allUser = service.getAllUser();
+		return new ResponseEntity<List<UserDto>>(allUser,HttpStatus.OK);
 	}
 	
 	@PostMapping(consumes={MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE,MediaType.ALL_VALUE},
 			produces={MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
-	public ResponseEntity<User> postUser(@RequestBody User us) {
-		User newUser = service.createUser(us);
-		return new ResponseEntity<User>(newUser,HttpStatus.OK);
+	public ResponseEntity<UserDto> postUser(@RequestBody UserDto us) {
+		System.out.println("post user called");
+		UserDto newUser = service.createUser(us);
+		return new ResponseEntity<UserDto>(newUser,HttpStatus.OK);
 	}
 	
 	@PutMapping(path="/{userId}"
 			,consumes={MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE,MediaType.ALL_VALUE},
 			produces={MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
-	public ResponseEntity<User> putUser(@PathVariable String userId,@RequestBody User us) {
-		User us2 = service.putUser(userId, us);
-		if(us2 == null) {
-			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);			
-		}else {
-			return new ResponseEntity<User>(us2,HttpStatus.OK);
-		}
+	public ResponseEntity<UserDto> putUser(@PathVariable Integer userId,@RequestBody UserDto us) {
+		UserDto us2 = service.putUser(userId, us);
+		return new ResponseEntity<UserDto>(us2,HttpStatus.OK);
 	}
 	
 	@DeleteMapping(path="/{userId}")
-	public ResponseEntity<User> deleteUser(@PathVariable String userId) {
-		User us = service.deleteUser(userId);
-		if(us != null) {
-			return new ResponseEntity<User>(us,HttpStatus.OK);
-		}
-		return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+	public ResponseEntity<UserDto> deleteUser(@PathVariable Integer userId) {
+		UserDto us = service.deleteUser(userId);
+		return new ResponseEntity<UserDto>(us,HttpStatus.OK);
 	}
 
 }
