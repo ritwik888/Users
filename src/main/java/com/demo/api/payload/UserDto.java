@@ -4,6 +4,8 @@ public class UserDto {
 	private String name;
 	private String id;
 	private String email;
+	private Integer dep;
+	private String about;
 	public String getName() {
 		return name;
 	}
@@ -22,5 +24,16 @@ public class UserDto {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+	public Integer getDep() {
+		return dep;
+	}
+	public void setDep(Integer dep) {
+		this.dep = dep;
+	}
+	public String getAbout() {
+		return about;
+	}
+	public void setAbout(String about) {
+		this.about = about;
+	}
 }

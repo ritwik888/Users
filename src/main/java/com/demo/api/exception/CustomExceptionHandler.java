@@ -2,7 +2,6 @@ package com.demo.api.exception;
 
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,21 +10,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.demo.api.service.UserService;
+import com.demo.api.payload.ApiResponse;
 
 @ControllerAdvice
-public class UserExceptionHandler extends ResponseEntityExceptionHandler{
+public class CustomExceptionHandler extends ResponseEntityExceptionHandler{
 	
-	@Autowired
-	UserService service;
-	
-	@ExceptionHandler(value= {Exception.class})
-	public ResponseEntity<Object> handleAnyException(Exception ex, WebRequest request){
-		String errorMessage = ex.getLocalizedMessage();
-		if(errorMessage == null) {
-			errorMessage = ex.toString();
-		}
-		return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+	@ExceptionHandler(value= {UserException.class})
+	public ResponseEntity<UserException> handleNullPointerExceptionException(UserException ex, WebRequest request){
+		String errorMessage = ex.getMessage();
+		UserException ue = new UserException();
+		ue.setMessage(errorMessage);
+		ue.setTime(new Date());
+		return new ResponseEntity<>(ue, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ExceptionHandler(value= {NullPointerException.class})
@@ -39,14 +35,12 @@ public class UserExceptionHandler extends ResponseEntityExceptionHandler{
 		ue.setTime(new Date());
 		return new ResponseEntity<>(ue, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
-	@ExceptionHandler(value= {UserException.class})
-	public ResponseEntity<UserException> handleNullPointerExceptionException(UserException ex, WebRequest request){
-		String errorMessage = ex.getMessage();
-		UserException ue = new UserException();
-		ue.setMessage(errorMessage);
-		ue.setTime(new Date());
-		return new ResponseEntity<>(ue, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+	@ExceptionHandler(value= {ResourceNotFoundException.class})
+	public ResponseEntity<ApiResponse> handleResourceNotFoundException(ResourceNotFoundException re, WebRequest request){
+		ApiResponse response = new ApiResponse("FAILED",re.getMessage());
+		return new ResponseEntity<ApiResponse>(response, HttpStatus.NOT_FOUND);
 	}
+	
 
 }

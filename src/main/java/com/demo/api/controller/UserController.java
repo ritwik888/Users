@@ -1,5 +1,7 @@
 package com.demo.api.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +28,13 @@ public class UserController {
 	@Autowired
 	UserService service;
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+	
 	@GetMapping(path="/{userId}", produces = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
 	public ResponseEntity<UserDto> getUser(@PathVariable Integer userId) {
-		System.out.println("get user called");
+		LOGGER.info("Getting user for id {}",userId);
 		UserDto us = service.getUser(userId);
+		LOGGER.info("User with id {} found, returning OK",userId);
 		return new ResponseEntity<UserDto>(us,HttpStatus.OK);
 	}
 	
@@ -37,16 +42,18 @@ public class UserController {
 	public ResponseEntity<List<UserDto>> getUsers(@RequestParam(value="page", defaultValue="1", required=false) int page,
 							@RequestParam(value="limit", defaultValue="10", required=false) int limit,
 							@RequestParam(value="sort", defaultValue="desc", required=false) String sort) {
-		System.out.println("get all user called");
+		LOGGER.info("Getting all user for page {}, limit {} and sort {}",page,limit,sort);
 		List<UserDto> allUser = service.getAllUser();
+		LOGGER.info("Returning list of size {} for page {}, limit {} and sort {}",allUser.size(),page,limit,sort);
 		return new ResponseEntity<List<UserDto>>(allUser,HttpStatus.OK);
 	}
 	
 	@PostMapping(consumes={MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE,MediaType.ALL_VALUE},
 			produces={MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
 	public ResponseEntity<UserDto> postUser(@RequestBody UserDto us) {
-		System.out.println("post user called");
+		LOGGER.info("Creating new user for {}",us);
 		UserDto newUser = service.createUser(us);
+		LOGGER.info("Created new user with id {}",newUser.getId());
 		return new ResponseEntity<UserDto>(newUser,HttpStatus.OK);
 	}
 	
